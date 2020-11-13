@@ -16,8 +16,7 @@
 
 import tensorflow as tf
 
-from tensorflow_tts.models.fastspeech import TFFastSpeech
-from tensorflow_tts.models.fastspeech import get_initializer
+from tensorflow_tts.models.fastspeech import TFFastSpeech, get_initializer
 
 
 class TFFastSpeechVariantPredictor(tf.keras.layers.Layer):
@@ -56,7 +55,8 @@ class TFFastSpeechVariantPredictor(tf.keras.layers.Layer):
                 name="speaker_embeddings",
             )
             self.speaker_fc = tf.keras.layers.Dense(
-                units=config.encoder_self_attention_params.hidden_size, name="speaker_fc"
+                units=config.encoder_self_attention_params.hidden_size,
+                name="speaker_fc",
             )
 
         self.config = config
@@ -64,7 +64,9 @@ class TFFastSpeechVariantPredictor(tf.keras.layers.Layer):
     def call(self, inputs, training=False):
         """Call logic."""
         encoder_hidden_states, speaker_ids, attention_mask = inputs
-        attention_mask = tf.cast(tf.expand_dims(attention_mask, 2), tf.float32)
+        attention_mask = tf.cast(
+            tf.expand_dims(attention_mask, 2), encoder_hidden_states.dtype
+        )
 
         if self.config.n_speakers > 1:
             speaker_embeddings = self.decoder_speaker_embeddings(speaker_ids)
@@ -91,12 +93,14 @@ class TFFastSpeech2(TFFastSpeech):
     def __init__(self, config, **kwargs):
         """Init layers for fastspeech."""
         super().__init__(config, **kwargs)
-        self.f0_predictor = TFFastSpeechVariantPredictor(config, name="f0_predictor")
+        self.f0_predictor = TFFastSpeechVariantPredictor(
+            config, dtype=tf.float32, name="f0_predictor"
+        )
         self.energy_predictor = TFFastSpeechVariantPredictor(
-            config, name="energy_predictor"
+            config, dtype=tf.float32, name="energy_predictor",
         )
         self.duration_predictor = TFFastSpeechVariantPredictor(
-            config, name="duration_predictor"
+            config, dtype=tf.float32, name="duration_predictor"
         )
 
         # define f0_embeddings and energy_embeddings
@@ -119,9 +123,6 @@ class TFFastSpeech2(TFFastSpeech):
         """Dummy input for building model."""
         # fake inputs
         input_ids = tf.convert_to_tensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], tf.int32)
-        attention_mask = tf.convert_to_tensor(
-            [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], tf.int32
-        )
         speaker_ids = tf.convert_to_tensor([0], tf.int32)
         duration_gts = tf.convert_to_tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], tf.int32)
         f0_gts = tf.convert_to_tensor(
@@ -130,19 +131,26 @@ class TFFastSpeech2(TFFastSpeech):
         energy_gts = tf.convert_to_tensor(
             [[10, 10, 10, 10, 10, 10, 10, 10, 10, 10]], tf.float32
         )
-        self(input_ids, attention_mask, speaker_ids, duration_gts, f0_gts, energy_gts)
+        self(
+            input_ids=input_ids,
+            speaker_ids=speaker_ids,
+            duration_gts=duration_gts,
+            f0_gts=f0_gts,
+            energy_gts=energy_gts,
+        )
 
     def call(
         self,
         input_ids,
-        attention_mask,
         speaker_ids,
         duration_gts,
         f0_gts,
         energy_gts,
         training=False,
+        **kwargs,
     ):
         """Call logic."""
+        attention_mask = tf.math.not_equal(input_ids, 0)
         embedding_output = self.embeddings([input_ids, speaker_ids], training=training)
         encoder_output = self.encoder(
             [embedding_output, attention_mask], training=training
@@ -193,24 +201,25 @@ class TFFastSpeech2(TFFastSpeech):
         last_decoder_hidden_states = decoder_output[0]
 
         # here u can use sum or concat more than 1 hidden states layers from decoder.
-        mel_before = self.mel_dense(last_decoder_hidden_states)
-        mel_after = (
-            self.postnet([mel_before, encoder_masks], training=training) + mel_before
+        mels_before = self.mel_dense(last_decoder_hidden_states)
+        mels_after = (
+            self.postnet([mels_before, encoder_masks], training=training) + mels_before
         )
 
-        outputs = (mel_before, mel_after, duration_outputs, f0_outputs, energy_outputs)
+        outputs = (
+            mels_before,
+            mels_after,
+            duration_outputs,
+            f0_outputs,
+            energy_outputs,
+        )
         return outputs
 
     def _inference(
-        self,
-        input_ids,
-        attention_mask,
-        speaker_ids,
-        speed_ratios,
-        f0_ratios,
-        energy_ratios,
+        self, input_ids, speaker_ids, speed_ratios, f0_ratios, energy_ratios, **kwargs,
     ):
         """Call logic."""
+        attention_mask = tf.math.not_equal(input_ids, 0)
         embedding_output = self.embeddings([input_ids, speaker_ids], training=False)
         encoder_output = self.encoder(
             [embedding_output, attention_mask], training=False
@@ -282,12 +291,11 @@ class TFFastSpeech2(TFFastSpeech):
             self._inference,
             experimental_relax_shapes=True,
             input_signature=[
-                tf.TensorSpec(shape=[None, None], dtype=tf.int32),
-                tf.TensorSpec(shape=[None, None], dtype=tf.bool),
-                tf.TensorSpec(shape=[None,], dtype=tf.int32),
-                tf.TensorSpec(shape=[None,], dtype=tf.float32),
-                tf.TensorSpec(shape=[None,], dtype=tf.float32),
-                tf.TensorSpec(shape=[None,], dtype=tf.float32),
+                tf.TensorSpec(shape=[None, None], dtype=tf.int32, name="input_ids"),
+                tf.TensorSpec(shape=[None,], dtype=tf.int32, name="speaker_ids"),
+                tf.TensorSpec(shape=[None,], dtype=tf.float32, name="speed_ratios"),
+                tf.TensorSpec(shape=[None,], dtype=tf.float32, name="f0_ratios"),
+                tf.TensorSpec(shape=[None,], dtype=tf.float32, name="energy_ratios"),
             ],
         )
 
@@ -295,11 +303,10 @@ class TFFastSpeech2(TFFastSpeech):
             self._inference,
             experimental_relax_shapes=True,
             input_signature=[
-                tf.TensorSpec(shape=[1, None], dtype=tf.int32),
-                tf.TensorSpec(shape=[1, None], dtype=tf.bool),
-                tf.TensorSpec(shape=[1,], dtype=tf.int32),
-                tf.TensorSpec(shape=[1,], dtype=tf.float32),
-                tf.TensorSpec(shape=[1,], dtype=tf.float32),
-                tf.TensorSpec(shape=[1,], dtype=tf.float32),
+                tf.TensorSpec(shape=[1, None], dtype=tf.int32, name="input_ids"),
+                tf.TensorSpec(shape=[1,], dtype=tf.int32, name="speaker_ids"),
+                tf.TensorSpec(shape=[1,], dtype=tf.float32, name="speed_ratios"),
+                tf.TensorSpec(shape=[1,], dtype=tf.float32, name="f0_ratios"),
+                tf.TensorSpec(shape=[1,], dtype=tf.float32, name="energy_ratios"),
             ],
         )
