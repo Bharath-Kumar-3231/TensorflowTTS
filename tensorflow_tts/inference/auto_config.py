@@ -23,6 +23,7 @@ from tensorflow_tts.configs import (
     FastSpeech2Config,
     MelGANGeneratorConfig,
     MultiBandMelGANGeneratorConfig,
+    HifiGANGeneratorConfig,
     Tacotron2Config,
     ParallelWaveGANGeneratorConfig,
 )
@@ -33,6 +34,7 @@ CONFIG_MAPPING = OrderedDict(
         ("fastspeech2", FastSpeech2Config),
         ("multiband_melgan_generator", MultiBandMelGANGeneratorConfig),
         ("melgan_generator", MelGANGeneratorConfig),
+        ("hifigan_generator", HifiGANGeneratorConfig),
         ("tacotron2", Tacotron2Config),
         ("parallel_wavegan_generator", ParallelWaveGANGeneratorConfig)
     ]
@@ -49,7 +51,7 @@ class AutoConfig:
     @classmethod
     def from_pretrained(cls, pretrained_path, **kwargs):
         with open(pretrained_path) as f:
-            config = yaml.load(f, Loader=yaml.Loader)
+            config = yaml.load(f, Loader=yaml.SafeLoader)
 
         try:
             model_type = config["model_type"]

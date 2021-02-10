@@ -23,28 +23,34 @@ from tensorflow_tts.configs import (
     FastSpeech2Config,
     MelGANGeneratorConfig,
     MultiBandMelGANGeneratorConfig,
+    HifiGANGeneratorConfig,
     Tacotron2Config,
     ParallelWaveGANGeneratorConfig,
 )
 
 from tensorflow_tts.models import (
-    TFFastSpeech,
-    TFFastSpeech2,
     TFMelGANGenerator,
     TFMBMelGANGenerator,
-    TFTacotron2,
+    TFHifiGANGenerator,
     TFParallelWaveGANGenerator,
+)
+
+from tensorflow_tts.inference.savable_models import (
+    SavableTFFastSpeech,
+    SavableTFFastSpeech2,
+    SavableTFTacotron2
 )
 
 
 TF_MODEL_MAPPING = OrderedDict(
     [
-        (FastSpeechConfig, TFFastSpeech),
-        (FastSpeech2Config, TFFastSpeech2),
+        (FastSpeech2Config, SavableTFFastSpeech2),
+        (FastSpeechConfig, SavableTFFastSpeech),
         (MultiBandMelGANGeneratorConfig, TFMBMelGANGenerator),
         (MelGANGeneratorConfig, TFMelGANGenerator),
-        (Tacotron2Config, TFTacotron2),
-        (ParallelWaveGANGeneratorConfig, TFParallelWaveGANGenerator)
+        (Tacotron2Config, SavableTFTacotron2),
+        (HifiGANGeneratorConfig, TFHifiGANGenerator),
+        (ParallelWaveGANGeneratorConfig, TFParallelWaveGANGenerator),
     ]
 )
 
@@ -66,7 +72,12 @@ class TFAutoModel(object):
                 if is_build:
                     model._build()
                 if pretrained_path is not None and ".h5" in pretrained_path:
-                    model.load_weights(pretrained_path)
+                    try:
+                        model.load_weights(pretrained_path)
+                    except:
+                        model.load_weights(
+                            pretrained_path, by_name=True, skip_mismatch=True
+                        )
                 return model
         raise ValueError(
             "Unrecognized configuration class {} for this kind of TFAutoModel: {}.\n"

@@ -37,8 +37,7 @@ from tensorflow_tts.configs.tacotron2 import Tacotron2Config
 from tensorflow_tts.models import TFTacotron2
 from tensorflow_tts.optimizers import AdamWeightDecay, WarmUp
 from tensorflow_tts.trainers import Seq2SeqBasedTrainer
-from tensorflow_tts.utils import (calculate_2d_loss, calculate_3d_loss,
-                                  return_strategy)
+from tensorflow_tts.utils import calculate_2d_loss, calculate_3d_loss, return_strategy
 
 
 class Tacotron2Trainer(Seq2SeqBasedTrainer):
@@ -112,6 +111,28 @@ class Tacotron2Trainer(Seq2SeqBasedTrainer):
         self.steps += 1
         self.tqdm.update(1)
         self._check_train_finish()
+
+    def _one_step_evaluate_per_replica(self, batch):
+        """One step evaluate per GPU
+
+        Tacotron-2 used teacher-forcing when training and evaluation.
+        So we need pass `training=True` for inference step.
+        
+        """
+        outputs = self._model(**batch, training=True)
+        _, dict_metrics_losses = self.compute_per_example_losses(batch, outputs)
+
+        self.update_eval_metrics(dict_metrics_losses)
+
+    def _one_step_predict_per_replica(self, batch):
+        """One step predict per GPU
+
+        Tacotron-2 used teacher-forcing when training and evaluation.
+        So we need pass `training=True` for inference step.
+        
+        """
+        outputs = self._model(**batch, training=True)
+        return outputs
 
     def compute_per_example_losses(self, batch, outputs):
         """Compute per example losses and return dict_metrics_losses
@@ -313,7 +334,7 @@ def main():
         default="",
         type=str,
         nargs="?",
-        help='pretrained weights .h5 file to load weights from. Auto-skips non-matching layers',
+        help="pretrained weights .h5 file to load weights from. Auto-skips non-matching layers",
     )
     args = parser.parse_args()
 
@@ -402,7 +423,9 @@ def main():
     train_dataset = train_dataset.create(
         is_shuffle=config["is_shuffle"],
         allow_cache=config["allow_cache"],
-        batch_size=config["batch_size"] * STRATEGY.num_replicas_in_sync,
+        batch_size=config["batch_size"]
+        * STRATEGY.num_replicas_in_sync
+        * config["gradient_accumulation_steps"],
     )
 
     valid_dataset = CharactorMelDataset(
@@ -433,13 +456,15 @@ def main():
     with STRATEGY.scope():
         # define model.
         tacotron_config = Tacotron2Config(**config["tacotron2_params"])
-        tacotron2 = TFTacotron2(config=tacotron_config, training=True, name="tacotron2")
+        tacotron2 = TFTacotron2(config=tacotron_config, name="tacotron2")
         tacotron2._build()
         tacotron2.summary()
-        
+
         if len(args.pretrained) > 1:
             tacotron2.load_weights(args.pretrained, by_name=True, skip_mismatch=True)
-            logging.info(f"Successfully loaded pretrained weight from {args.pretrained}.")
+            logging.info(
+                f"Successfully loaded pretrained weight from {args.pretrained}."
+            )
 
         # AdamW for tacotron2
         learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(
