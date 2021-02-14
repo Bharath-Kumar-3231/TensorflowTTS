@@ -1,0 +1,23 @@
+{
+  "TargetCapacity": 1,
+  "IamFleetRole": "arn:aws:iam::920359119333:role/ecsSpotFleetRole",
+  "LaunchSpecifications": [
+    {
+      "ImageId": "ami-09f77b37a0d32243a",
+      "KeyName": "murf-dev-key-pair",
+      "SecurityGroups": [
+        {
+          "GroupId": "sg-8d5800f7"
+        }
+      ],
+      "InstanceType": "p2.xlarge",
+      "Placement": {
+        "AvailabilityZone": "us-east-2a, us-east-2b, us-east-2c, us-east-2d"
+      },
+      "UserData": "base64_encoded_bash_script",
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::920359119333:instance-profile/ecsInstanceRole"
+      }
+    }
+  ]
+}
