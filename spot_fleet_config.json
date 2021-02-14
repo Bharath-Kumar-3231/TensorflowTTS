@@ -12,7 +12,7 @@
       ],
       "InstanceType": "p2.xlarge",
       "Placement": {
-        "AvailabilityZone": "us-east-2a, us-east-2b, us-east-2c, us-east-2d"
+        "AvailabilityZone": "us-east-2a, us-east-2b, us-east-2c"
       },
       "UserData": "base64_encoded_bash_script",
       "IamInstanceProfile": {
