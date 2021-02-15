@@ -46,7 +46,7 @@ if [ $VOLUME_ID ]; then
     		cd /home/ubuntu/TensorflowTTS/
 
 		# Initiate training using the tensorflow_36 conda environment
-		sudo -H -u ubuntu bash -c "source activate tensorflow2_latest_p37;pip install .; ./train_resumable.sh" >>/dltraining/logs.txt 2>&1
+		sudo -H -u ubuntu bash -c "source /home/ubuntu/anaconda3/bin/activate tensorflow2_latest_p37;pip install .; ./train_resumable.sh" >>/dltraining/logs.txt 2>&1
 fi
 
 # After training, clean up by cancelling spot requests and terminating itself
