@@ -41,6 +41,7 @@ if [ $VOLUME_ID ]; then
 		sudo mkdir /dltraining
 		sudo mount /dev/xvdf /dltraining
 		sudo chown -R ubuntu: /dltraining/
+		cd /home/ubuntu
 		git clone https://github.com/aragorntheking/TensorflowTTS.git
 		sudo chown -R ubuntu: TensorflowTTS
     		cd /home/ubuntu/TensorflowTTS/
