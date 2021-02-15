@@ -43,10 +43,10 @@ if [ $VOLUME_ID ]; then
 		sudo chown -R ubuntu: /dltraining/
 		git clone https://github.com/aragorntheking/TensorflowTTS.git
 		sudo chown -R ubuntu: TensorflowTTS
-    cd /home/ubuntu/TensorflowTTS/
+    		cd /home/ubuntu/TensorflowTTS/
 
 		# Initiate training using the tensorflow_36 conda environment
-		sudo -H -u ubuntu bash -c "source activate tensorflow2_latest_p37;pip install .; ./train_resumable.sh"
+		sudo -H -u ubuntu bash -c "source activate tensorflow2_latest_p37;pip install .; ./train_resumable.sh" >>/dltraining/logs.txt 2>&1
 fi
 
 # After training, clean up by cancelling spot requests and terminating itself
