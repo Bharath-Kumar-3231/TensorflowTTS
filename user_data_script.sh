@@ -45,6 +45,7 @@ if [ $VOLUME_ID ]; then
 		git clone https://github.com/aragorntheking/TensorflowTTS.git
 		sudo chown -R ubuntu: TensorflowTTS
     		cd /home/ubuntu/TensorflowTTS/
+		chmod +x train_resumable.sh
 
 		# Initiate training using the tensorflow_36 conda environment
 		sudo -H -u ubuntu bash -c "source /home/ubuntu/anaconda3/bin/activate tensorflow2_latest_p37;pip install .; ./train_resumable.sh" >>/dltraining/logs.txt 2>&1
