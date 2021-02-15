@@ -1,7 +1,7 @@
 CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py \
   --train-dir /dltraining/datasets/dump_libritts/train/ \
   --dev-dir /dltraining/datasets/dump_libritts/valid/ \
-  --outdir ./examples/fastspeech2_libritts/outdir_libri_v6/ \
+  --outdir /dltraining/outdir/ \
   --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts.yaml \
   --use-norm 1 \
   --f0-stat /dltraining/datasets/dump_libritts/stats_f0.npy \
