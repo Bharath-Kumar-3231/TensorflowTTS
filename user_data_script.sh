@@ -27,7 +27,7 @@ if [ $VOLUME_ID ]; then
 								--availability-zone $INSTANCE_AZ \
 								--snapshot-id $SNAPSHOT_ID \
 						--volume-type gp3 \
-						--tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=dl_main_volume-snapshot}]' \
+						--tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=dl_main_volume}]' \
 						--query VolumeId --output text)
 				aws ec2 wait volume-available --region $AWS_REGION --volume-id $VOLUME_ID
 		fi
