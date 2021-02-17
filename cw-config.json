@@ -1,0 +1,18 @@
+{
+	"agent": {
+		"run_as_user": "cwagent"
+	},
+	"logs": {
+		"logs_collected": {
+			"files": {
+				"collect_list": [
+					{
+						"file_path": "/dltraining/logs.txt",
+						"log_group_name": "dltraining-logs",
+						"log_stream_name": "{instance_id}"
+					}
+				]
+			}
+		}
+	}
+}
