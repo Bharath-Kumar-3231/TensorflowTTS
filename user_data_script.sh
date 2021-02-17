@@ -43,6 +43,11 @@ if [ $VOLUME_ID ]; then
 		sudo chown -R ubuntu: /dltraining/
 		cd /home/ubuntu
 		git clone https://github.com/aragorntheking/TensorflowTTS.git
+		
+		wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+	        sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+	        sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/home/ubuntu/TensorflowTTS/cw-config.json
+
 		sudo chown -R ubuntu: TensorflowTTS
     		cd /home/ubuntu/TensorflowTTS/
 		chmod +x train_resumable.sh
