@@ -1,10 +1,10 @@
 #CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python examples/fastspeech2_libritts/train_fastspeech2.py \
-$DEFAULT_TASK_ID="TASK-1"
 DATASET_DIR=/dltraining/datasets
 OUTDIR=/dltraining/outdir
 CKPT_DIR=$OUTDIR/checkpoints
 
 taskid=${1}
+echo "task id is $taskid"
 
 latestCkptPath=$(ls -t $CKPT_DIR/ckpt-*index | head -1)
 ckptExists=false
