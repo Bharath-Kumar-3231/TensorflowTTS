@@ -4,12 +4,14 @@ DATASET_DIR=/dltraining/datasets
 OUTDIR=/dltraining/outdir
 CKPT_DIR=$OUTDIR/checkpoints
 
-taskid=${1:-$DEFAULT_TASK_ID}
+taskid=${1}
 
 latestCkptPath=$(ls -t $CKPT_DIR/ckpt-*index | head -1)
 ckptExists=false
+latestCkpt="NA"
 if [[ $latestCkptPath == *"index" ]]; 
 then
+        latestCkpt="$( echo "$latestCkptPath" | sed -e 's#.index$##' )"
         ckptExists=true
 fi
 echo "latest checkpoint is $latestCkptPath"
@@ -28,7 +30,7 @@ CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py
     --dataset_mapping /dltraining/datasets/dump_libritts/libritts_mapper.json \
     --dataset_config preprocess/libritts_preprocess.yaml \
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
-    --resume "$latestCkptPath"
+    --resume "$latestCkpt"
 else
 aws cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 "$DATASET_DIR/pretrained_fs2_192-80k.h5"
 CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py \
