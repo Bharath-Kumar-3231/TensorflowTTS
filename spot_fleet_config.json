@@ -10,7 +10,7 @@
           "GroupId": "sg-8d5800f7"
         }
       ],
-      "InstanceType": "p2.xlarge",
+      "InstanceType": "g4dn.xlarge",
       "Placement": {
         "AvailabilityZone": "us-east-2a, us-east-2b, us-east-2c"
       },
