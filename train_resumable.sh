@@ -1,7 +1,9 @@
-#CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python examples/fastspeech2_libritts/train_fastspeech2.py \
 DATASET_DIR=/dltraining/datasets
 OUTDIR=/dltraining/outdir
 CKPT_DIR=$OUTDIR/checkpoints
+
+gpus=$(nvidia-smi --query-gpu=index --format=csv,noheader | paste -s -d',')
+echo "gpus = $gpus"
 
 taskid=${1}
 echo "task id is $taskid"
@@ -18,7 +20,7 @@ echo "latest checkpoint is $latestCkptPath"
 
 if [[ $ckptExists == true ]]; 
 then
-CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py \
+CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
     --outdir /dltraining/outdir/ \
@@ -33,7 +35,7 @@ CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py
     --resume "$latestCkpt"
 else
 aws cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 "$DATASET_DIR/pretrained_fs2_192-80k.h5"
-CUDA_VISIBLE_DEVICES=0 python examples/fastspeech2_libritts/train_fastspeech2.py \
+CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
     --outdir /dltraining/outdir/ \
