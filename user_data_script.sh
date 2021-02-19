@@ -40,6 +40,15 @@ if [ $VOLUME_ID ]; then
 		# Mount volume and change ownership, since this script is run as root
 		sudo mkdir /dltraining
 		sudo mount /dev/xvdf /dltraining
+		
+		DIRECTORY=/dltraining/datasets
+		if [ ! -d "$DIRECTORY" ]; then
+			sudo mount /dev/sdf /dltraining
+	    	fi
+	    	if [ ! -d "$DIRECTORY" ]; then
+			echo "Unable to mount /dltraining "; exit -1;
+	    	fi
+		
 		sudo chown -R ubuntu: /dltraining/
 		cd /home/ubuntu
 		git clone https://github.com/aragorntheking/TensorflowTTS.git
