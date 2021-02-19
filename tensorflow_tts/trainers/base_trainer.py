@@ -518,7 +518,7 @@ class GanBasedTrainer(BasedTrainer):
 
         logging.info(
             f"(Steps: {self.steps}) Finished evaluation "
-            f"({eval_steps_per_epoch} steps per epoch)."
+            #f"({eval_steps_per_epoch} steps per epoch)."
         )
 
         # average loss
