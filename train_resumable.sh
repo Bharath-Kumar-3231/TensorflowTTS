@@ -34,7 +34,7 @@ CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
     --resume "$latestCkpt"
 else
-aws cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 "$DATASET_DIR/pretrained_fs2_192-80k.h5"
+aws s3 cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 "$DATASET_DIR/pretrained_fs2_192-80k.h5"
 CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
@@ -60,8 +60,8 @@ echo "latest model is $latestModelPath"
 
 if [[ $modelExists == true ]]; 
 then
-  aws cp "$OUTDIR/config.yaml" "s3://murf-models-dev/trained/$taskid/config.yaml"
-  aws cp "$latestModelPath" "s3://murf-models-dev/trained/$taskid/model.h5"
+  aws s3 cp "$OUTDIR/config.yaml" "s3://murf-models-dev/trained/$taskid/config.yaml"
+  aws s3 cp "$latestModelPath" "s3://murf-models-dev/trained/$taskid/model.h5"
 fi
 
 
