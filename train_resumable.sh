@@ -60,7 +60,7 @@ echo "latest model is $latestModelPath"
 
 if [[ $modelExists == true ]]; 
 then
-  aws s3 cp "$OUTDIR/config.yaml" "s3://murf-models-dev/trained/$taskid/config.yml"
+  aws s3 cp "$OUTDIR/config.yml" "s3://murf-models-dev/trained/$taskid/config.yml"
   aws s3 cp "$latestModelPath" "s3://murf-models-dev/trained/$taskid/model.h5"
 fi
 
