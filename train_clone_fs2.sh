@@ -35,10 +35,10 @@ then
       --dataset_stats $DATASET_DIR/dump_libritts/stats.npy \
       --resume "$latestCkpt"
 else
-  pretrainedFile=/dltraining/datasets/pretrained_fs2_192-80k.h5
+  pretrainedFile=/dltraining/datasets/pretrained_fs2_192-150k.h5
   if [ ! -f $pretrainedFile ]; then
       echo "Downloading pretrained fs2 from s3"
-      aws s3 cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 $pretrainedFile
+      aws s3 cp s3://murf-models-dev/pretrained/fs2-192-150k.h5 $pretrainedFile
   fi
 
   echo "Using PRETRAINED from model $pretrainedFile"
