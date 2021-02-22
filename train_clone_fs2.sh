@@ -25,7 +25,7 @@ then
       --train-dir $DATASET_DIR/dump_libritts/train/ \
       --dev-dir $DATASET_DIR/dump_libritts/valid/ \
       --outdir $OUTDIR/ \
-      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts.yaml \
+      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml \
       --use-norm 1 \
       --f0-stat $DATASET_DIR/dump_libritts/stats_f0.npy \
       --energy-stat $DATASET_DIR/dump_libritts/stats_energy.npy \
@@ -46,7 +46,7 @@ else
       --train-dir $DATASET_DIR/dump_libritts/train/ \
       --dev-dir $DATASET_DIR/dump_libritts/valid/ \
       --outdir $OUTDIR/ \
-      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts.yaml \
+      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml \
       --use-norm 1 \
       --f0-stat $DATASET_DIR/dump_libritts/stats_f0.npy \
       --energy-stat $DATASET_DIR/dump_libritts/stats_energy.npy \
