@@ -51,6 +51,9 @@ else
     echo "$speakerId untarred"
   done
   
+  rm -rf mfa
+  rm -rf /home/ubuntu/Documents
+  
   ./examples/mfa_extraction/scripts/prepare_mfa.sh
 
   python examples/mfa_extraction/run_mfa.py \
