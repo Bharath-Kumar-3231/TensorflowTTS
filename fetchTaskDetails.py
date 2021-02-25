@@ -4,7 +4,7 @@ from boto3.dynamodb.conditions import Key
 
 def query_task(task_id, dynamodb=None):
     if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
 
     table = dynamodb.Table('murfUser')
     response = table.query(
@@ -22,9 +22,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("Argument values:")
     print(args.task_id)
-    task = query_task(task_id)
+    task = query_task(args.task_id)
+    print(task)
     f = open(args.path, "a")
-    f.write(','.join(task.speakerIds))
+    f.write(','.join([str(i) for i in task['speakerIds']]))
     f.close()
-    
-    
