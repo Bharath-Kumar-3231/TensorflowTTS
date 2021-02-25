@@ -1,6 +1,9 @@
 DATASET_DIR=/dltraining/datasets_$taskid
 OUTDIR=/dltraining/outdir_$taskid
 CKPT_DIR=$OUTDIR/checkpoints
+libritts=$DATASET_DIR/libritts
+dump=$DATASET_DIR/dump_libritts
+fs2_yaml=examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml
 
 gpus=$(nvidia-smi --query-gpu=index --format=csv,noheader | paste -s -d',')
 echo "gpus = $gpus"
@@ -25,7 +28,7 @@ then
       --train-dir $DATASET_DIR/dump_libritts/train/ \
       --dev-dir $DATASET_DIR/dump_libritts/valid/ \
       --outdir $OUTDIR/ \
-      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml \
+      --config $fs2_yaml \
       --use-norm 1 \
       --f0-stat $DATASET_DIR/dump_libritts/stats_f0.npy \
       --energy-stat $DATASET_DIR/dump_libritts/stats_energy.npy \
@@ -35,6 +38,48 @@ then
       --dataset_stats $DATASET_DIR/dump_libritts/stats.npy \
       --resume "$latestCkpt"
 else
+  TASK_DEF_FILE=$DATASET_DIR/task_speakers.txt
+  rm $TASK_DEF_FILE
+  python fetchTaskDetails.py --task_id=taskid --path=$TASK_DEF_FILE
+  speakerIds=`cat $TASK_DEF_FILE`
+  mkdir $libri
+  
+  for speakerId in $(echo $speakerIds | sed "s/,/ /g")
+  do
+    aws s3 cp s3://murf-models-dev/dataset/speakers/$speakerId.tar DATASET_DIR/$speakerId.tar
+    tar -C libritts/ -xvf DATASET_DIR/$speakerId.tar
+    echo "$speakerId untarred"
+  done
+  
+  !./examples/mfa_extraction/scripts/prepare_mfa.sh
+
+  !python examples/mfa_extraction/run_mfa.py \
+  --corpus_directory $libritts \
+  --output_directory ./mfa/parsed \
+  --jobs 8
+
+  !python examples/mfa_extraction/txt_grid_parser.py \
+  --yaml_path $fs2_yaml \
+  --dataset_path $libritts \
+  --text_grid_path ./mfa/parsed \
+  --output_durations_path $libritts/durations \
+  --sample_rate 24000
+
+  !tensorflow-tts-preprocess --rootdir $libritts \
+  --outdir $dump \
+  --config preprocess/libritts_preprocess.yaml \
+  --dataset libritts
+
+  !tensorflow-tts-normalize --rootdir $libritts \
+  --outdir $dump \
+  --config preprocess/libritts_preprocess.yaml \
+  --dataset libritts
+
+  !python examples/mfa_extraction/fix_mismatch.py \
+  --base_path $dump \
+  --trimmed_dur_path $libritts/trimmed-durations \
+  --dur_path $libritts/durations
+  
   pretrainedFile=/dltraining/datasets/pretrained_fs2_192-150k.h5
   if [ ! -f $pretrainedFile ]; then
       echo "Downloading pretrained fs2 from s3"
@@ -43,17 +88,17 @@ else
 
   echo "Using PRETRAINED from model $pretrainedFile"
   CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
-      --train-dir $DATASET_DIR/dump_libritts/train/ \
-      --dev-dir $DATASET_DIR/dump_libritts/valid/ \
+      --train-dir $dump/train/ \
+      --dev-dir $dump/valid/ \
       --outdir $OUTDIR/ \
-      --config ./examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml \
+      --config $fs2_yaml \
       --use-norm 1 \
-      --f0-stat $DATASET_DIR/dump_libritts/stats_f0.npy \
-      --energy-stat $DATASET_DIR/dump_libritts/stats_energy.npy \
+      --f0-stat $dump/stats_f0.npy \
+      --energy-stat $dump/stats_energy.npy \
       --mixed_precision 1 \
-      --dataset_mapping $DATASET_DIR/dump_libritts/libritts_mapper.json \
+      --dataset_mapping $dump/libritts_mapper.json \
       --dataset_config preprocess/libritts_preprocess.yaml \
-      --dataset_stats $DATASET_DIR/dump_libritts/stats.npy \
+      --dataset_stats $dump/stats.npy \
       --pretrained $pretrainedFile
 fi
 
