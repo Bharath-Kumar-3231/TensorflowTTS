@@ -43,6 +43,7 @@ requirements = {
         "click",
         "g2p_en",
         "dataclasses",
+        "boto3",
         "german_transliterate @ git+https://github.com/repodiac/german_transliterate.git#egg=german_transliterate"
     ],
     "setup": ["numpy", "pytest-runner",],
