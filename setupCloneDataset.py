@@ -58,6 +58,7 @@ if __name__ == '__main__':
                 shutil.rmtree(speakerDestFolderPath)
             os.mkdir(speakerDestFolderPath)
             speakerSrcFolderPath = os.path.join(args.dataset_path, i)
+            count=0
             for fileName in os.listdir(speakerSrcFolderPath):
                 if ".wav" in fileName:
                     wavsrc = os.path.join(speakerSrcFolderPath, fileName)
@@ -67,5 +68,7 @@ if __name__ == '__main__':
                         speakerDestFolderPath, fileName))
                     copyfile(txtsrc, os.path.join(
                         speakerDestFolderPath, fileName.replace(".wav", ".txt")))
-                    break
+                    count += 1
+                    if count > 5:
+                        break
 
