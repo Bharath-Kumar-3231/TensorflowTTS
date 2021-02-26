@@ -54,7 +54,7 @@ if __name__ == '__main__':
         os.remove(tarPath)
         print("Extracted"+str(i))
 
-    if args.for_vocoder == 'true':
+    if args.for_vocoder == 'false':
         for i in os.listdir(args.dataset_path):
             if i.isnumeric():
                 speakerDestFolderPath = os.path.join(args.libri_path, i)
