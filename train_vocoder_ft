@@ -37,7 +37,7 @@ then
   --config $yaml \
   --resume "$latestCkpt"
 else
-  python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET --forVocoder=true
+  python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET --for_vocoder='true'
   numSpeakers=$(ls $libritts|wc -l)
   echo "$numSpeakers found in libritts"
   
