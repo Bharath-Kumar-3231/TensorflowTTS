@@ -54,6 +54,8 @@ if __name__ == '__main__':
     for i in os.listdir(args.dataset_path):
         if i.isnumeric():
             speakerDestFolderPath = os.path.join(args.libri_path, i)
+            if os.path.exists(speakerDestFolderPath) and os.path.isdir(speakerDestFolderPath):
+                shutil.rmtree(speakerDestFolderPath)
             os.mkdir(speakerDestFolderPath)
             speakerSrcFolderPath = os.path.join(args.dataset_path, i)
             for fileName in os.listdir(speakerSrcFolderPath):
