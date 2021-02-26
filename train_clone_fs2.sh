@@ -43,6 +43,8 @@ then
       --resume "$latestCkpt"
 else
   python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET
+  numSpeakers=$(ls $libritts|wc -l)
+  echo "$numSpeakers found in libritts"
   
   rm -rf mfa
   rm -rf /home/ubuntu/Documents
