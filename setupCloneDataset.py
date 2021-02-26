@@ -4,6 +4,7 @@ from boto3.dynamodb.conditions import Key
 import tarfile
 import os
 from shutil import copyfile
+import shutil
 
 def query_task(task_id, dynamodb=None):
     if not dynamodb:
@@ -34,6 +35,9 @@ if __name__ == '__main__':
     print(args.dataset_path)
     task = query_task(args.task_id)
     s3 = boto3.resource('s3')
+    
+    if os.path.exists(args.libri_path) and os.path.isdir(args.libri_path):
+        shutil.rmtree(args.libri_path)
     os.mkdir(args.libri_path)
 
     for i in task['speakerIds']:
