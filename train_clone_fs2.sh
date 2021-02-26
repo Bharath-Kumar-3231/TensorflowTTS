@@ -42,7 +42,7 @@ then
       --dataset_stats $dump/stats.npy \
       --resume "$latestCkpt"
 else
-  python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET
+  python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET --forVocoder=false
   numSpeakers=$(ls $libritts|wc -l)
   echo "$numSpeakers found in libritts"
   
