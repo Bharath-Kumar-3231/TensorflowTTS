@@ -27,12 +27,15 @@ if __name__ == '__main__':
                         help='Folder to dump speaker folders')
     parser.add_argument('--dataset_path', type=str,
                         help='Path to core speaker folders')
+    parser.add_argument('--for_vocoder', type=str,
+                        help='setup for Vocoder')
 
     args = parser.parse_args()
     print("Argument values:")
     print(args.task_id)
     print(args.libri_path)
     print(args.dataset_path)
+    print(args.for_vocoder)
     task = query_task(args.task_id)
     s3 = boto3.resource('s3')
     
@@ -51,22 +54,23 @@ if __name__ == '__main__':
         os.remove(tarPath)
         print("Extracted"+str(i))
 
-    for i in os.listdir(args.dataset_path):
-        if i.isnumeric():
-            speakerDestFolderPath = os.path.join(args.libri_path, i)
-            if os.path.exists(speakerDestFolderPath) and os.path.isdir(speakerDestFolderPath):
-                shutil.rmtree(speakerDestFolderPath)
-            os.mkdir(speakerDestFolderPath)
-            speakerSrcFolderPath = os.path.join(args.dataset_path, i)
-            count=0
-            for fileName in os.listdir(speakerSrcFolderPath):
-                if ".wav" in fileName:
-                    wavsrc = os.path.join(speakerSrcFolderPath, fileName)
-                    txtsrc = os.path.join(speakerSrcFolderPath, fileName.replace(".wav", ".txt"))
-                    if os.path.isfile(txtsrc):
-                        copyfile(wavsrc, os.path.join(speakerDestFolderPath, fileName))
-                        copyfile(txtsrc, os.path.join(speakerDestFolderPath, fileName.replace(".wav", ".txt")))
-                        count += 1
-                        if count > 5:
-                            break
+    if args.for_vocoder == 'true':
+        for i in os.listdir(args.dataset_path):
+            if i.isnumeric():
+                speakerDestFolderPath = os.path.join(args.libri_path, i)
+                if os.path.exists(speakerDestFolderPath) and os.path.isdir(speakerDestFolderPath):
+                    shutil.rmtree(speakerDestFolderPath)
+                os.mkdir(speakerDestFolderPath)
+                speakerSrcFolderPath = os.path.join(args.dataset_path, i)
+                count=0
+                for fileName in os.listdir(speakerSrcFolderPath):
+                    if ".wav" in fileName:
+                        wavsrc = os.path.join(speakerSrcFolderPath, fileName)
+                        txtsrc = os.path.join(speakerSrcFolderPath, fileName.replace(".wav", ".txt"))
+                        if os.path.isfile(txtsrc):
+                            copyfile(wavsrc, os.path.join(speakerDestFolderPath, fileName))
+                            copyfile(txtsrc, os.path.join(speakerDestFolderPath, fileName.replace(".wav", ".txt")))
+                            count += 1
+                            if count > 5:
+                                break
 
