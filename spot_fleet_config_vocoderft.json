@@ -4,7 +4,7 @@
   "IamFleetRole": "arn:aws:iam::920359119333:role/ecsSpotFleetRole",
   "LaunchSpecifications": [
     {
-      "ImageId": "ami-09f77b37a0d32243a",
+      "ImageId": "ami-072519eedc1730252",
       "KeyName": "murf-dev-key-pair",
       "SecurityGroups": [
         {
