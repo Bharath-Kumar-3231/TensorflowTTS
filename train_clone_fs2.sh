@@ -5,6 +5,9 @@ libritts=$DATASET_DIR/libritts
 dump=$DATASET_DIR/dump_libritts
 fs2_yaml=examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml
 
+mkdir $DATASET_DIR
+mkdir $libritts
+
 gpus=$(nvidia-smi --query-gpu=index --format=csv,noheader | paste -s -d',')
 echo "gpus = $gpus"
 
@@ -47,7 +50,7 @@ else
   for speakerId in $(echo $speakerIds | sed "s/,/ /g")
   do
     aws s3 cp s3://murf-models-dev/dataset/speakers/$speakerId.tar DATASET_DIR/$speakerId.tar
-    tar -C libritts/ -xvf DATASET_DIR/$speakerId.tar
+    tar -C $libritts/ -xvf DATASET_DIR/$speakerId.tar
     echo "$speakerId untarred"
   done
   
