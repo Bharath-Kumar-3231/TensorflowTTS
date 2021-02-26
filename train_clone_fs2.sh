@@ -1,3 +1,6 @@
+taskid=${1}
+echo "task id is $taskid"
+
 DATASET_DIR=/dltraining/datasets_$taskid
 OUTDIR=/dltraining/outdir_$taskid
 CKPT_DIR=$OUTDIR/checkpoints
@@ -5,14 +8,11 @@ libritts=$DATASET_DIR/libritts
 dump=$DATASET_DIR/dump_libritts
 fs2_yaml=examples/fastspeech2_libritts/conf/fastspeech2libritts_clone.yaml
 
-mkdir $DATASET_DIR
-mkdir $libritts
+mkdir "$DATASET_DIR"
+mkdir "$libritts"
 
 gpus=$(nvidia-smi --query-gpu=index --format=csv,noheader | paste -s -d',')
 echo "gpus = $gpus"
-
-taskid=${1}
-echo "task id is $taskid"
 
 latestCkptPath=$(ls -t $CKPT_DIR/ckpt-*index | head -1)
 ckptExists=false
