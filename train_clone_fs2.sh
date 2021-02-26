@@ -1,6 +1,7 @@
 taskid=${1}
 echo "task id is $taskid"
 
+CORE_DATASET=/dltraining/datasets/libritts
 DATASET_DIR=/dltraining/datasets_$taskid
 OUTDIR=/dltraining/outdir_$taskid
 CKPT_DIR=$OUTDIR/checkpoints
@@ -41,18 +42,7 @@ then
       --dataset_stats $dump/stats.npy \
       --resume "$latestCkpt"
 else
-  TASK_DEF_FILE=$DATASET_DIR/task_speakers.txt
-  rm $TASK_DEF_FILE
-  python fetchTaskDetails.py --task_id=taskid --path=$TASK_DEF_FILE
-  speakerIds=`cat $TASK_DEF_FILE`
-  mkdir $libri
-  
-  for speakerId in $(echo $speakerIds | sed "s/,/ /g")
-  do
-    aws s3 cp s3://murf-models-dev/dataset/speakers/$speakerId.tar DATASET_DIR/$speakerId.tar
-    tar -C $libritts/ -xvf DATASET_DIR/$speakerId.tar
-    echo "$speakerId untarred"
-  done
+  python setupCloneDataset.py --task_id=$taskid --libri_path=$libritts --dataset_path=$CORE_DATASET
   
   rm -rf mfa
   rm -rf /home/ubuntu/Documents
