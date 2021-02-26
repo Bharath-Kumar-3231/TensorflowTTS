@@ -62,7 +62,7 @@ if [ $VOLUME_ID ]; then
 
 		sudo chown -R ubuntu: TensorflowTTS
     		cd /home/ubuntu/TensorflowTTS/
-		chmod +x train_resumable.sh
+		chmod +x train_clone_fs2.sh
 
 		# Initiate training using the tensorflow_36 conda environment
 		sudo -H -u ubuntu bash -c "source /home/ubuntu/anaconda3/bin/activate tensorflow2_latest_p37;pip install .; ./train_clone_fs2.sh MURF_TASK_ID" >>/home/ubuntu/logs.txt 2>&1
