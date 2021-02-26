@@ -69,7 +69,7 @@ else
   --config preprocess/libritts_preprocess.yaml \
   --dataset libritts
 
-  tensorflow-tts-normalize --rootdir $libritts \
+  tensorflow-tts-normalize --rootdir $dump \
   --outdir $dump \
   --config preprocess/libritts_preprocess.yaml \
   --dataset libritts
