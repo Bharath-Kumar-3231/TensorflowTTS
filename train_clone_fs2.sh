@@ -48,6 +48,7 @@ else
   
   rm -rf mfa
   rm -rf /home/ubuntu/Documents
+  rm -rf $dump
   
   ./examples/mfa_extraction/scripts/prepare_mfa.sh
 
