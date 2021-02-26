@@ -62,13 +62,11 @@ if __name__ == '__main__':
             for fileName in os.listdir(speakerSrcFolderPath):
                 if ".wav" in fileName:
                     wavsrc = os.path.join(speakerSrcFolderPath, fileName)
-                    txtsrc = os.path.join(
-                        speakerSrcFolderPath, fileName.replace(".wav", ".txt"))
-                    copyfile(wavsrc, os.path.join(
-                        speakerDestFolderPath, fileName))
-                    copyfile(txtsrc, os.path.join(
-                        speakerDestFolderPath, fileName.replace(".wav", ".txt")))
-                    count += 1
-                    if count > 5:
-                        break
+                    txtsrc = os.path.join(speakerSrcFolderPath, fileName.replace(".wav", ".txt"))
+                    if os.path.isfile(txtsrc):
+                        copyfile(wavsrc, os.path.join(speakerDestFolderPath, fileName))
+                        copyfile(txtsrc, os.path.join(speakerDestFolderPath, fileName.replace(".wav", ".txt")))
+                        count += 1
+                        if count > 5:
+                            break
 
