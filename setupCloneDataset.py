@@ -30,7 +30,7 @@ if __name__ == '__main__':
     task = query_task(args.task_id)
     print(task)
     s3 = boto3.resource('s3')
-    os.mkdir(libri_path)
+    os.mkdir(args.libri_path)
     
     for i in task['speakerIds']:
         tarPath = args.libri_path+"/"+str(i)+".tar"
