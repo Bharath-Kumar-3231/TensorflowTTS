@@ -36,23 +36,12 @@ if __name__ == '__main__':
     print(args.libri_path)
     print(args.dataset_path)
     print(args.for_vocoder)
-    task = query_task(args.task_id)
+    
     s3 = boto3.resource('s3')
     
     if os.path.exists(args.libri_path) and os.path.isdir(args.libri_path):
         shutil.rmtree(args.libri_path)
     os.mkdir(args.libri_path)
-
-    for i in task['speakerIds']:
-        tarPath = args.libri_path + "/" + str(i) + ".tar"
-        s3Key = "dataset/speakers/" + str(i) + ".tar"
-        print("Downloading " + s3Key)
-        s3.Bucket('murf-models-dev').download_file(s3Key, tarPath)
-        tar = tarfile.open(tarPath)
-        tar.extractall(path=args.libri_path)
-        tar.close()
-        os.remove(tarPath)
-        print("Extracted"+str(i))
 
     if args.for_vocoder == 'false':
         for i in os.listdir(args.dataset_path):
@@ -73,4 +62,18 @@ if __name__ == '__main__':
                             count += 1
                             if count > 5:
                                 break
-
+                                
+    task = query_task(args.task_id)
+    for i in task['speakerIds']:
+        speakerDestFolderPath = args.libri_path + "/" + str(i) 
+        if os.path.exists(speakerDestFolderPath) and os.path.isdir(speakerDestFolderPath):
+            shutil.rmtree(speakerDestFolderPath)
+        tarPath = speakerDestFolderPath + ".tar"
+        s3Key = "dataset/speakers/" + str(i) + ".tar"
+        print("Downloading " + s3Key)
+        s3.Bucket('murf-models-dev').download_file(s3Key, tarPath)
+        tar = tarfile.open(tarPath)
+        tar.extractall(path=args.libri_path)
+        tar.close()
+        os.remove(tarPath)
+        print("Extracted"+str(i))
