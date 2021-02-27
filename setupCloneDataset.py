@@ -76,4 +76,4 @@ if __name__ == '__main__':
         tar.extractall(path=args.libri_path)
         tar.close()
         os.remove(tarPath)
-        print("Extracted"+str(i))
+        print("Extracted:"+str(i))
