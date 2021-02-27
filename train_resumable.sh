@@ -52,7 +52,7 @@ fi
 
 latestModelPath=$(ls -t $CKPT_DIR/model-*h5 | head -1)
 modelExists=false
-if [[ $latestmodelPath == *"h5" ]]; 
+if [[ $latestModelPath == *"h5" ]]; 
 then
   modelExists=true
 fi
