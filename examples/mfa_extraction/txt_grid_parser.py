@@ -72,6 +72,38 @@ class TxtGridParser:
 
         with open(os.path.join(self.dataset_path, self.training_file), "w") as f:
             f.writelines(data)
+    
+    def parse_punc_intervals(self,text_grid, txtFile):
+        words = text_grid[0]
+        punc_mapper = {"!":"ECL","?":"QSN"}
+        punc_phones = set(punc_mapper.keys())
+
+        puncIntervals=[]
+        with open(txtFile,'r') as f:
+          sentence =f.read().rstrip().lower()
+          split=sentence.split(" ")
+          wordInSentenceIdx=-1
+          for idx, wordInterval in enumerate(words.intervals):
+            if wordInterval.mark=="":
+              continue
+            else:
+              wordInSentenceIdx+=1
+            if wordInSentenceIdx>=0 and len(split)>wordInSentenceIdx:
+              wordInSentence=split[wordInSentenceIdx]
+            else:
+              continue
+            lastChar=wordInSentence.rstrip()[-1]
+            if lastChar in punc_phones and len(words.intervals)>idx+1:
+              nextInterval=words.intervals[idx+1]
+              if nextInterval.mark=="":
+                puncIntervals.append({'punc':punc_mapper[lastChar], 'interval':nextInterval}) 
+
+    def phon_in_punc(interval, puncIntervals):
+      for idx, puncInterval in enumerate(puncIntervals):
+        if puncInterval['interval'].minTime<=interval.minTime \
+        and puncInterval['interval'].maxTime>=interval.maxTime:
+          return {'addPuncPhon': True, 'phon': puncInterval['punc']}
+      return {'addPuncPhon':False, 'phon':{}}
 
     def parse_text_grid(self, file_list: list, data: list, speaker_name: str):
         logging.info(
@@ -84,14 +116,20 @@ class TxtGridParser:
             pha = text_grid[1]
             durations = []
             phs = []
+            txtFile= '{}/{}/{}.txt'.format(self.dataset_path,speaker_name,f_name.split(".")[0])
+            puncIntervals = parse_punc_intervals(self, text_grid, txtFile)
             for iterator, interval in enumerate(pha.intervals):
                 mark = interval.mark
 
                 if mark in self.sil_phones:
-                    mark = self.phones_mapper[mark]
-                    if mark == "END":
-                        assert iterator == pha.intervals.__len__() - 1
-                        # check if empty ph is always last example in your dataset if not fix it
+                    punc = phon_in_punc(interval, puncIntervals)
+                    if punc['addPuncPhon']:
+                      mark = punc['phon']
+                    else:
+                      mark = self.phones_mapper[mark]
+                      if mark == "END":
+                          assert iterator == pha.intervals.__len__() - 1
+                          # check if empty ph is always last example in your dataset if not fix it
 
                 dur = interval.duration() * (self.sample_rate / self.hop_size)
                 durations.append(round(dur))
