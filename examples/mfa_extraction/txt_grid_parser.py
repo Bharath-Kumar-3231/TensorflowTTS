@@ -120,7 +120,7 @@ class TxtGridParser:
             durations = []
             phs = []
             txtFile= '{}/{}/{}.txt'.format(self.dataset_path,speaker_name,f_name.split(".")[0])
-            parsedPuncs = self.parse_punc_intervals(self, text_grid, txtFile)
+            parsedPuncs = self.parse_punc_intervals(text_grid, txtFile)
             puncIntervals = parsedPuncs['puncIntervals']
             hasPunc = parsedPuncs['hasPunc']
             puncMarkCreated = False
