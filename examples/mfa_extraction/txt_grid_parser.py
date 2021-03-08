@@ -93,7 +93,7 @@ class TxtGridParser:
               wordInSentenceIdx+=1
             if wordInSentenceIdx>=0 and len(split)>wordInSentenceIdx:
               wordInSentence=split[wordInSentenceIdx]
-              print(wordInSentence)
+              #print(wordInSentence)
             else:
               continue
             lastChar=wordInSentence.rstrip()[-1]
@@ -149,7 +149,7 @@ class TxtGridParser:
             
             if hasPunc and not puncMarkCreated:
                 logging.info(
-                    f"\n Punc mark not created for: {text_grid} \n {full_ph} \n"
+                    f"\n Punc mark not created for: {text_grid[0]} \n {full_ph} \n"
                 )
 
             assert full_ph.split(" ").__len__() == durations.__len__()  # safety check
