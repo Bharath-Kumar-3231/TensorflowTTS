@@ -101,7 +101,7 @@ class TxtGridParser:
               nextInterval=words.intervals[idx+1]
               if nextInterval.mark=="":
                 puncIntervals.append({'punc':punc_mapper[lastChar], 'interval':nextInterval}) 
-        return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc}
+        return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc, 'sentence':sentence}
 
     def phon_in_punc(self, interval, puncIntervals):
       for idx, puncInterval in enumerate(puncIntervals):
@@ -152,7 +152,7 @@ class TxtGridParser:
             
             if hasPunc and not puncMarkCreated:
                 logging.info(
-                    f"\n Punc mark not created for: {text_grid[0]} \n {full_ph} \n"
+                    f"\n Punc mark not created for: {parsedPuncs['sentence']} \n {full_ph} \n"
                 )
 
             assert full_ph.split(" ").__len__() == durations.__len__()  # safety check
