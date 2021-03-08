@@ -73,7 +73,7 @@ class TxtGridParser:
         with open(os.path.join(self.dataset_path, self.training_file), "w") as f:
             f.writelines(data)
     
-    def parse_punc_intervals(self,text_grid, txtFile):
+    def parse_punc_intervals(self, text_grid, txtFile):
         words = text_grid[0]
         punc_mapper = {"!":"ECL","?":"QSN"}
         punc_phones = set(punc_mapper.keys())
@@ -101,7 +101,7 @@ class TxtGridParser:
                 puncIntervals.append({'punc':punc_mapper[lastChar], 'interval':nextInterval}) 
         return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc}
 
-    def phon_in_punc(interval, puncIntervals):
+    def phon_in_punc(self, interval, puncIntervals):
       for idx, puncInterval in enumerate(puncIntervals):
         if puncInterval['interval'].minTime<=interval.minTime \
         and puncInterval['interval'].maxTime>=interval.maxTime:
@@ -120,7 +120,7 @@ class TxtGridParser:
             durations = []
             phs = []
             txtFile= '{}/{}/{}.txt'.format(self.dataset_path,speaker_name,f_name.split(".")[0])
-            parsedPuncs = parse_punc_intervals(self, text_grid, txtFile)
+            parsedPuncs = self.parse_punc_intervals(self, text_grid, txtFile)
             puncIntervals = parsedPuncs['puncIntervals']
             hasPunc = parsedPuncs['hasPunc']
             puncMarkCreated = False
@@ -128,7 +128,7 @@ class TxtGridParser:
                 mark = interval.mark
 
                 if mark in self.sil_phones:
-                    punc = phon_in_punc(interval, puncIntervals)
+                    punc = self.phon_in_punc(interval, puncIntervals)
                     if punc['addPuncPhon']:
                       mark = punc['phon']
                       puncMarkCreated = True
