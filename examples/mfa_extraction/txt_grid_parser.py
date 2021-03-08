@@ -92,6 +92,7 @@ class TxtGridParser:
               wordInSentenceIdx+=1
             if wordInSentenceIdx>=0 and len(split)>wordInSentenceIdx:
               wordInSentence=split[wordInSentenceIdx]
+              print(wordInSentence)
             else:
               continue
             lastChar=wordInSentence.rstrip()[-1]
