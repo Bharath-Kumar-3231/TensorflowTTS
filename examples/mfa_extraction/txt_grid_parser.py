@@ -144,7 +144,7 @@ class TxtGridParser:
 
             full_ph = " ".join(phs)
             
-            if hasPunc and !puncMarkCreated:
+            if hasPunc and not puncMarkCreated:
                 logging.info(
                     f"\n Punc mark not created for: {text_grid} \n {full_ph} \n"
                 )
