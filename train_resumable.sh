@@ -34,7 +34,7 @@ CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
     --resume "$latestCkpt"
 else
-aws s3 cp s3://murf-models-dev/pretrained/fs2-192-80k.h5 "$DATASET_DIR/pretrained_fs2_192-80k.h5"
+rm -rf /dltraining/outdir/
 CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
@@ -47,7 +47,6 @@ CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech
     --dataset_mapping /dltraining/datasets/dump_libritts/libritts_mapper.json \
     --dataset_config preprocess/libritts_preprocess.yaml \
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
-    --pretrained "$DATASET_DIR/pretrained_fs2_192-80k.h5"
 fi
 
 latestModelPath=$(ls -t $CKPT_DIR/model-*h5 | head -1)
