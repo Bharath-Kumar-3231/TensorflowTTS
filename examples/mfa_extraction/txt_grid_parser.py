@@ -77,10 +77,12 @@ class TxtGridParser:
         words = text_grid[0]
         punc_mapper = {"!":"ECL","?":"QSN"}
         punc_phones = set(punc_mapper.keys())
-
+        hasPunc = False
         puncIntervals=[]
         with open(txtFile,'r') as f:
           sentence =f.read().rstrip().lower()
+          if '!' in sentence or '?' in  sentence:
+            hasPunc = True
           split=sentence.split(" ")
           wordInSentenceIdx=-1
           for idx, wordInterval in enumerate(words.intervals):
@@ -97,6 +99,7 @@ class TxtGridParser:
               nextInterval=words.intervals[idx+1]
               if nextInterval.mark=="":
                 puncIntervals.append({'punc':punc_mapper[lastChar], 'interval':nextInterval}) 
+        return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc}
 
     def phon_in_punc(interval, puncIntervals):
       for idx, puncInterval in enumerate(puncIntervals):
@@ -117,7 +120,10 @@ class TxtGridParser:
             durations = []
             phs = []
             txtFile= '{}/{}/{}.txt'.format(self.dataset_path,speaker_name,f_name.split(".")[0])
-            puncIntervals = parse_punc_intervals(self, text_grid, txtFile)
+            parsedPuncs = parse_punc_intervals(self, text_grid, txtFile)
+            puncIntervals = parsedPuncs['puncIntervals']
+            hasPunc = parsedPuncs['hasPunc']
+            puncMarkCreated = False
             for iterator, interval in enumerate(pha.intervals):
                 mark = interval.mark
 
@@ -125,6 +131,7 @@ class TxtGridParser:
                     punc = phon_in_punc(interval, puncIntervals)
                     if punc['addPuncPhon']:
                       mark = punc['phon']
+                      puncMarkCreated = True
                     else:
                       mark = self.phones_mapper[mark]
                       if mark == "END":
@@ -136,6 +143,11 @@ class TxtGridParser:
                 phs.append(mark)
 
             full_ph = " ".join(phs)
+            
+            if hasPunc and !puncMarkCreated:
+                logging.info(
+                    f"\n Punc mark not created for: {text_grid} \n {full_ph} \n"
+                )
 
             assert full_ph.split(" ").__len__() == durations.__len__()  # safety check
 
