@@ -96,7 +96,10 @@ class TxtGridParser:
               #print(wordInSentence)
             else:
               continue
-            lastChar=wordInSentence.rstrip()[-1]
+            trimmedWord = wordInSentence.rstrip()
+            lastChar=trimmedWord[-1]
+            if (lastChar == "'" or lastChar == '"') and len(trimmedWord)>1:
+                lastChar=trimmedWord[-2]
             if lastChar in punc_phones and len(words.intervals)>idx+1:
               nextInterval=words.intervals[idx+1]
               if nextInterval.mark=="":
