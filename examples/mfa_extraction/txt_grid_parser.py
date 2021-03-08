@@ -105,9 +105,12 @@ class TxtGridParser:
 
     def phon_in_punc(self, interval, puncIntervals):
       for idx, puncInterval in enumerate(puncIntervals):
-        if puncInterval['interval'].minTime<=interval.minTime \
+        if (puncInterval['interval'].minTime<=interval.minTime \
         and puncInterval['interval'].maxTime>=interval.maxTime \
-        and interval.mark != '' :
+        and interval.mark != '') or \
+        (puncInterval['interval'].minTime==interval.minTime \
+        and puncInterval['interval'].maxTime==interval.maxTime \
+        and interval.mark == '') :
           return {'addPuncPhon': True, 'phon': puncInterval['punc']}
       return {'addPuncPhon':False, 'phon':{}}
 
