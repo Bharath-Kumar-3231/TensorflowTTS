@@ -84,6 +84,7 @@ class TxtGridParser:
           if '!' in sentence or '?' in  sentence:
             hasPunc = True
           split=sentence.split(" ")
+          split[:]=[x for x in split if x]
           wordInSentenceIdx=-1
           for idx, wordInterval in enumerate(words.intervals):
             if wordInterval.mark=="":
