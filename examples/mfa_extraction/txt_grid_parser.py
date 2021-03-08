@@ -87,7 +87,7 @@ class TxtGridParser:
           split[:]=[x for x in split if x]
           wordInSentenceIdx=-1
           for idx, wordInterval in enumerate(words.intervals):
-            if wordInterval.mark=="":
+            if wordInterval.mark=="" or wordInterval.mark=='<unk>':
               continue
             else:
               wordInSentenceIdx+=1
