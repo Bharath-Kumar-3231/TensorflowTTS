@@ -33,7 +33,7 @@ valid_symbols.append("END")
 valid_symbols.append("QSN")
 valid_symbols.append("ECL")
 
-#_punctuation = "!'(),.:;? "
+_punctuation = "'(),.:; "
 _arpabet = ["@" + s for s in valid_symbols]
 
 #LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
