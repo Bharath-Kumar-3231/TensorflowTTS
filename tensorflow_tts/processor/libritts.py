@@ -36,8 +36,8 @@ valid_symbols.append("ECL")
 _punctuation = "'(),.:; "
 _arpabet = ["@" + s for s in valid_symbols]
 
-#LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
-LIBRITTS_SYMBOLS = _arpabet
+LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
+#LIBRITTS_SYMBOLS = _arpabet
 
 
 @dataclass
