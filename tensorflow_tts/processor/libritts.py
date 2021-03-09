@@ -119,8 +119,8 @@ class LibriTTSProcessor(BaseProcessor):
                 break
             if txt == "?":
                data.append("@QSN")  
-            else if txt == "!":
+            elif txt == "!":
                data.append("@ECL")  
-            else if txt != " ":
+            elif txt != " ":
                 data.append("@" + txt) 
         return data
