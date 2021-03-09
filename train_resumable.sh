@@ -20,7 +20,8 @@ echo "latest checkpoint is $latestCkptPath"
 
 if [[ $ckptExists == true ]]; 
 then
-CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
+  echo "RESUMING from checkpoint $latestCkpt"
+  CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
     --outdir /dltraining/outdir/ \
@@ -34,8 +35,8 @@ CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
     --resume "$latestCkpt"
 else
-rm -rf /dltraining/outdir/
-CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
+  rm -rf /dltraining/outdir/
+  CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
     --outdir /dltraining/outdir/ \
@@ -46,7 +47,7 @@ CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech
     --mixed_precision 1 \
     --dataset_mapping /dltraining/datasets/dump_libritts/libritts_mapper.json \
     --dataset_config preprocess/libritts_preprocess.yaml \
-    --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
+    --dataset_stats /dltraining/datasets/dump_libritts/stats.npy
 fi
 
 latestModelPath=$(ls -t $CKPT_DIR/model-*h5 | head -1)
