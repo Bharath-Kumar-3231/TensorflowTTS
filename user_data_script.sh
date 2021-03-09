@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y;
+#sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y;
 
 # Get instance ID, Instance AZ, Volume ID and Volume AZ
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
