@@ -78,10 +78,15 @@ class TxtGridParser:
         punc_phones = ["!","?"]
         hasPunc = False
         puncIntervals=[]
+        endingPunc='NA'
         with open(txtFile,'r') as f:
           sentence =f.read().rstrip().lower()
           if '!' in sentence or '?' in  sentence:
             hasPunc = True
+            if sentence.endswith("?") or sentence.endswith("?\"") or sentence.endswith("?'"):
+                endingPunc='?'
+            elif sentence.endswith("!") or sentence.endswith("!\"") or sentence.endswith("!'"):
+                endingPunc='!'
           split=sentence.replace('-', ' ').split(" ")
           split[:]=[x for x in split if x]
           wordInSentenceIdx=-1
@@ -103,7 +108,7 @@ class TxtGridParser:
               nextInterval=words.intervals[idx+1]
               if nextInterval.mark=="":
                 puncIntervals.append({'punc':lastChar, 'interval':nextInterval}) 
-        return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc, 'sentence':sentence}
+        return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc, 'sentence':sentence, 'endingPunc':endingPunc}
 
     def phon_in_punc(self, interval, puncIntervals):
       for idx, puncInterval in enumerate(puncIntervals):
@@ -134,7 +139,6 @@ class TxtGridParser:
             puncMarkCreated = False
             for iterator, interval in enumerate(pha.intervals):
                 mark = interval.mark
-
                 if mark in self.sil_phones:
                     punc = self.phon_in_punc(interval, puncIntervals)
                     if punc['addPuncPhon']:
@@ -150,6 +154,8 @@ class TxtGridParser:
                 durations.append(round(dur))
                 phs.append(mark)
 
+            if parsedPuncs['endingPunc'] != 'NA' and phs[len(phs)-2] == 'SIL' and phs[len(phs)-1] == 'END':
+                phs[len(phs)-2] = parsedPuncs['endingPunc']
             full_ph = " ".join(phs)
             
             if hasPunc and not puncMarkCreated:
