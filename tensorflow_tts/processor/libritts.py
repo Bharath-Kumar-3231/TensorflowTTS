@@ -117,11 +117,7 @@ class LibriTTSProcessor(BaseProcessor):
                         "@END"
                     )  # TODO try learning without end token and compare results
                 break
-            if txt == "?":
-               data.append("@QSN")  
-            elif txt == "!":
-               data.append("@ECL")  
-            elif txt == ",":
+            if txt in ",;":
                data.append("@SIL")  
             elif txt in _punctuation:
                continue
