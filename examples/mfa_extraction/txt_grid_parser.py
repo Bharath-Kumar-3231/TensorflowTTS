@@ -156,6 +156,8 @@ class TxtGridParser:
 
             if parsedPuncs['endingPunc'] != 'NA' and phs[len(phs)-2] == 'SIL' and phs[len(phs)-1] == 'END':
                 phs[len(phs)-2] = parsedPuncs['endingPunc']
+                puncMarkCreated = True
+
             full_ph = " ".join(phs)
             
             if hasPunc and not puncMarkCreated:
