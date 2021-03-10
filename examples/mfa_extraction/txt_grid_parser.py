@@ -75,8 +75,7 @@ class TxtGridParser:
     
     def parse_punc_intervals(self, text_grid, txtFile):
         words = text_grid[0]
-        punc_mapper = {"!":"ECL","?":"QSN"}
-        punc_phones = set(punc_mapper.keys())
+        punc_phones = ["!","?"]
         hasPunc = False
         puncIntervals=[]
         with open(txtFile,'r') as f:
@@ -103,7 +102,7 @@ class TxtGridParser:
             if lastChar in punc_phones and len(words.intervals)>idx+1:
               nextInterval=words.intervals[idx+1]
               if nextInterval.mark=="":
-                puncIntervals.append({'punc':punc_mapper[lastChar], 'interval':nextInterval}) 
+                puncIntervals.append({'punc':lastChar, 'interval':nextInterval}) 
         return {'puncIntervals': puncIntervals, 'hasPunc':hasPunc, 'sentence':sentence}
 
     def phon_in_punc(self, interval, puncIntervals):
