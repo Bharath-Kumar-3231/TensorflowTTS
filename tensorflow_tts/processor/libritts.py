@@ -33,11 +33,11 @@ valid_symbols.append("END")
 valid_symbols.append("QSN")
 valid_symbols.append("ECL")
 
-_punctuation = "'(),.:; "
+#_punctuation = "'(),.:; "
 _arpabet = ["@" + s for s in valid_symbols]
 
-LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
-#LIBRITTS_SYMBOLS = _arpabet
+#LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
+LIBRITTS_SYMBOLS = _arpabet
 
 
 @dataclass
@@ -121,6 +121,8 @@ class LibriTTSProcessor(BaseProcessor):
                data.append("@QSN")  
             elif txt == "!":
                data.append("@ECL")  
+            elif txt == ",":
+               data.append("@SIL")  
             elif txt != " ":
-                data.append("@" + txt) 
+               data.append("@" + txt) 
         return data
