@@ -30,10 +30,10 @@ g2p = grapheme_to_phonem.G2p()
 valid_symbols = g2p.phonemes
 valid_symbols.append("SIL")
 valid_symbols.append("END")
-valid_symbols.append("QSN")
-valid_symbols.append("ECL")
+valid_symbols.append("?")
+valid_symbols.append("!")
 
-#_punctuation = "'(),.:; "
+_punctuation = "'(),.:;\" "
 _arpabet = ["@" + s for s in valid_symbols]
 
 #LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
@@ -123,6 +123,8 @@ class LibriTTSProcessor(BaseProcessor):
                data.append("@ECL")  
             elif txt == ",":
                data.append("@SIL")  
+            elif txt in _punctuation:
+               continue
             elif txt != " ":
                data.append("@" + txt) 
         return data
