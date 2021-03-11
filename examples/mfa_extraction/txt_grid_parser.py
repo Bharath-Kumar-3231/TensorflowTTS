@@ -83,9 +83,9 @@ class TxtGridParser:
           sentence =f.read().rstrip().lower()
           if '!' in sentence or '?' in  sentence:
             hasPunc = True
-            if sentence.endswith("?") or sentence.endswith("?\"") or sentence.endswith("?'"):
+            if sentence.endswith("?") or sentence.endswith("?\"") or sentence.endswith("?'") or sentence.endswith("?."):
                 endingPunc='?'
-            elif sentence.endswith("!") or sentence.endswith("!\"") or sentence.endswith("!'"):
+            elif sentence.endswith("!") or sentence.endswith("!\"") or sentence.endswith("!'") or sentence.endswith("!."):
                 endingPunc='!'
           split=sentence.replace('-', ' ').split(" ")
           split[:]=[x for x in split if x]
