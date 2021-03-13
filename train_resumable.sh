@@ -2,7 +2,6 @@ DATASET_DIR=/dltraining/datasets
 OUTDIR=/dltraining/outdir
 CKPT_DIR=$OUTDIR/checkpoints
 
-rm -rf $OUTDIR
 gpus=$(nvidia-smi --query-gpu=index --format=csv,noheader | paste -s -d',')
 echo "gpus = $gpus"
 
@@ -36,6 +35,7 @@ then
     --dataset_stats /dltraining/datasets/dump_libritts/stats.npy \
     --resume "$latestCkpt"
 else
+  rm -rf $OUTDIR
   CUDA_VISIBLE_DEVICES=$gpus python examples/fastspeech2_libritts/train_fastspeech2.py \
     --train-dir /dltraining/datasets/dump_libritts/train/ \
     --dev-dir /dltraining/datasets/dump_libritts/valid/ \
