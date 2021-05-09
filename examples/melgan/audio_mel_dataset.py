@@ -117,6 +117,10 @@ class AudioMelDataset(AbstractDataset):
         datasets = tf.data.Dataset.from_generator(
             self.generator, output_types=output_types, args=(self.get_args())
         )
+        
+        options = tf.data.Options()
+        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
+        datasets = datasets.with_options(options)
 
         # load dataset
         datasets = datasets.map(
