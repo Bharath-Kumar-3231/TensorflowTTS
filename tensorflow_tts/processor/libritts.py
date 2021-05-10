@@ -101,7 +101,13 @@ class LibriTTSProcessor(BaseProcessor):
         return self.symbols_to_ids(self.text_to_ph(text))
 
     def symbols_to_ids(self, symbols_list: list):
-        return [self.symbol_to_id[s] for s in symbols_list]
+        ids = []
+        for symbol in symbols_list:
+          if symbol in self.symbol_to_id:
+            ids.append(self.symbol_to_id[s])
+          else:
+          print('unknown symbol ' + symbol)      
+        return ids
 
     def text_to_ph(self, text: str):
         return self.clean_g2p(g2p(text))
