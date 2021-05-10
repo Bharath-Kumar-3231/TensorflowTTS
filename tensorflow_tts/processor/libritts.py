@@ -104,7 +104,7 @@ class LibriTTSProcessor(BaseProcessor):
         ids = []
         for symbol in symbols_list:
           if symbol in self.symbol_to_id:
-            ids.append(self.symbol_to_id[s])
+            ids.append(self.symbol_to_id[symbol])
           else:
             print('unknown symbol ' + symbol)      
         return ids
