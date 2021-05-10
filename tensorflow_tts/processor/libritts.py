@@ -106,7 +106,7 @@ class LibriTTSProcessor(BaseProcessor):
           if symbol in self.symbol_to_id:
             ids.append(self.symbol_to_id[s])
           else:
-          print('unknown symbol ' + symbol)      
+            print('unknown symbol ' + symbol)      
         return ids
 
     def text_to_ph(self, text: str):
