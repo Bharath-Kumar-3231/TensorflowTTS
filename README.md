@@ -19,12 +19,15 @@
 :zany_face: TensorFlowTTS provides real-time state-of-the-art speech synthesis architectures such as Tacotron-2, Melgan, Multiband-Melgan, FastSpeech, FastSpeech2 based-on TensorFlow 2. With Tensorflow 2, we can speed-up training/inference progress, optimizer further by using [fake-quantize aware](https://www.tensorflow.org/model_optimization/guide/quantization/training_comprehensive_guide) and [pruning](https://www.tensorflow.org/model_optimization/guide/pruning/pruning_with_keras), make TTS models can be run faster than real-time and be able to deploy on mobile devices or embedded systems.
 
 ## What's new
-- 2020/12/02 **(NEW!)** Support German TTS with [Thorsten dataset](https://github.com/thorstenMueller/deep-learning-german-tts). See the [Colab](https://colab.research.google.com/drive/1W0nSFpsz32M0OcIkY9uMOiGrLTPKVhTy?usp=sharing). Thanks [thorstenMueller](https://github.com/thorstenMueller) and [monatis](https://github.com/monatis).
-- 2020/11/24 **(NEW!)** Add HiFi-GAN vocoder. See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/hifigan)
-- 2020/11/19 **(NEW!)** Add Multi-GPU gradient accumulator. See [here](https://github.com/TensorSpeech/TensorFlowTTS/pull/377)
-- 2020/08/23  Add Parallel WaveGAN tensorflow implementation. See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/parallel_wavegan)
+- 2021/06/01 (**NEW!**) Integrated with [Huggingface Hub](https://huggingface.co/tensorspeech). See the [PR](https://github.com/TensorSpeech/TensorFlowTTS/pull/555). Thanks [patrickvonplaten](https://github.com/patrickvonplaten) and [osanseviero](https://github.com/osanseviero)
+- 2021/03/18 (**NEW!**) Support IOS for FastSpeech2 and MB MelGAN. Thanks [kewlbear](https://github.com/kewlbear). See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/ios)
+- 2021/01/18 (**NEW!**) Support TFLite C++ inference. Thanks [luan78zaoha](https://github.com/luan78zaoha). See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/cpptflite)
+- 2020/12/02 Support German TTS with [Thorsten dataset](https://github.com/thorstenMueller/deep-learning-german-tts). See the [Colab](https://colab.research.google.com/drive/1W0nSFpsz32M0OcIkY9uMOiGrLTPKVhTy?usp=sharing). Thanks [thorstenMueller](https://github.com/thorstenMueller) and [monatis](https://github.com/monatis)
+- 2020/11/24 Add HiFi-GAN vocoder. See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/hifigan)
+- 2020/11/19 Add Multi-GPU gradient accumulator. See [here](https://github.com/TensorSpeech/TensorFlowTTS/pull/377)
+- 2020/08/23 Add Parallel WaveGAN tensorflow implementation. See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/parallel_wavegan)
 - 2020/08/23 Add MBMelGAN G + ParallelWaveGAN G example. See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/multiband_pwgan)
-- 2020/08/20  Add C++ inference code. Thank [@ZDisket](https://github.com/ZDisket). See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/cppwin)
+- 2020/08/20 Add C++ inference code. Thank [@ZDisket](https://github.com/ZDisket). See [here](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/cppwin)
 - 2020/08/18 Update [new base processor](https://github.com/TensorSpeech/TensorFlowTTS/blob/master/tensorflow_tts/processor/base_processor.py). Add [AutoProcessor](https://github.com/TensorSpeech/TensorFlowTTS/blob/master/tensorflow_tts/inference/auto_processor.py) and [pretrained processor](https://github.com/TensorSpeech/TensorFlowTTS/blob/master/tensorflow_tts/processor/pretrained/) json file
 - 2020/08/14 Support Chinese TTS. Pls see the [colab](https://colab.research.google.com/drive/1YpSHRBRPBI7cnTkQn1UcVTWEQVbsUm1S?usp=sharing). Thank [@azraelkuan](https://github.com/azraelkuan)
 - 2020/08/05 Support Korean TTS. Pls see the [colab](https://colab.research.google.com/drive/1ybWwOS5tipgPFttNulp77P6DAB5MtiuN?usp=sharing). Thank [@crux153](https://github.com/crux153)
@@ -252,7 +255,7 @@ A detail implementation of base_trainer from [tensorflow_tts/trainer/base_traine
 All models on this repo are trained based-on **GanBasedTrainer** (see [train_melgan.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/melgan/train_melgan.py), [train_melgan_stft.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/melgan.stft/train_melgan_stft.py), [train_multiband_melgan.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/multiband_melgan/train_multiband_melgan.py)) and **Seq2SeqBasedTrainer** (see [train_tacotron2.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/tacotron2/train_tacotron2.py), [train_fastspeech.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/fastspeech/train_fastspeech.py)).
 
 # End-to-End Examples
-You can know how to inference each model at [notebooks](https://github.com/tensorspeech/TensorFlowTTS/tree/master/notebooks) or see a [colab](https://colab.research.google.com/drive/1akxtrLZHKuMiQup00tzO2olCaN-y3KiD?usp=sharing) (for English), [colab](https://colab.research.google.com/drive/1ybWwOS5tipgPFttNulp77P6DAB5MtiuN?usp=sharing) (for Korean). Here is an example code for end2end inference with fastspeech and melgan.
+You can know how to inference each model at [notebooks](https://github.com/tensorspeech/TensorFlowTTS/tree/master/notebooks) or see a [colab](https://colab.research.google.com/drive/1akxtrLZHKuMiQup00tzO2olCaN-y3KiD?usp=sharing) (for English), [colab](https://colab.research.google.com/drive/1ybWwOS5tipgPFttNulp77P6DAB5MtiuN?usp=sharing) (for Korean). Here is an example code for end2end inference with fastspeech2 and multi-band melgan. We uploaded all our pretrained in [HuggingFace Hub](https://huggingface.co/tensorspeech).
 
 ```python
 import numpy as np
@@ -261,42 +264,34 @@ import yaml
 
 import tensorflow as tf
 
-from tensorflow_tts.inference import AutoConfig
 from tensorflow_tts.inference import TFAutoModel
 from tensorflow_tts.inference import AutoProcessor
 
-# initialize fastspeech model.
-fs_config = AutoConfig.from_pretrained('./examples/fastspeech/conf/fastspeech.v1.yaml')
-fastspeech = TFAutoModel.from_pretrained(
-    config=fs_config,
-    pretrained_path="./examples/fastspeech/pretrained/model-195000.h5"
-)
+# initialize fastspeech2 model.
+fastspeech2 = TFAutoModel.from_pretrained("tensorspeech/tts-fastspeech2-ljspeech-en")
 
 
-# initialize melgan model
-melgan_config = AutoConfig.from_pretrained('./examples/melgan/conf/melgan.v1.yaml')
-melgan = TFAutoModel.from_pretrained(
-    config=melgan_config,
-    pretrained_path="./examples/melgan/checkpoint/generator-1500000.h5"
-)
+# initialize mb_melgan model
+mb_melgan = TFAutoModel.from_pretrained("tensorspeech/tts-mb_melgan-ljspeech-en")
 
 
 # inference
-processor = AutoProcessor.from_pretrained(pretrained_path="./test/files/ljspeech_mapper.json")
+processor = AutoProcessor.from_pretrained("tensorspeech/tts-fastspeech2-ljspeech-en")
 
 ids = processor.text_to_sequence("Recent research at Harvard has shown meditating for as little as 8 weeks, can actually increase the grey matter in the parts of the brain responsible for emotional regulation, and learning.")
-ids = tf.expand_dims(ids, 0)
 # fastspeech inference
 
-masked_mel_before, masked_mel_after, duration_outputs = fastspeech.inference(
-    ids,
-    speaker_ids=tf.zeros(shape=[tf.shape(ids)[0]], dtype=tf.int32),
-    speed_ratios=tf.constant([1.0], dtype=tf.float32)
+mel_before, mel_after, duration_outputs, _, _ = fastspeech2.inference(
+    input_ids=tf.expand_dims(tf.convert_to_tensor(input_ids, dtype=tf.int32), 0),
+    speaker_ids=tf.convert_to_tensor([0], dtype=tf.int32),
+    speed_ratios=tf.convert_to_tensor([1.0], dtype=tf.float32),
+    f0_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32),
+    energy_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32),
 )
 
 # melgan inference
-audio_before = melgan.inference(masked_mel_before)[0, :, 0]
-audio_after = melgan.inference(masked_mel_after)[0, :, 0]
+audio_before = mb_melgan.inference(mel_before)[0, :, 0]
+audio_after = mb_melgan.inference(mel_after)[0, :, 0]
 
 # save to file
 sf.write('./audio_before.wav', audio_before, 22050, "PCM_16")
@@ -304,7 +299,14 @@ sf.write('./audio_after.wav', audio_after, 22050, "PCM_16")
 ```
 
 # Contact
-[Minh Nguyen Quan Anh](https://github.com/tensorspeech): nguyenquananhminh@gmail.com, [erogol](https://github.com/erogol): erengolge@gmail.com, [Kuan Chen](https://github.com/azraelkuan): azraelkuan@gmail.com, [Dawid Kobus](https://github.com/machineko): machineko@protonmail.com, [Takuya Ebata](https://github.com/MokkeMeguru): meguru.mokke@gmail.com, [Trinh Le Quang](https://github.com/l4zyf9x): trinhle.cse@gmail.com, [Yunchao He](https://github.com/candlewill): yunchaohe@gmail.com, [Alejandro Miguel Velasquez](https://github.com/ZDisket): xml506ok@gmail.com
+- [Minh Nguyen Quan Anh](https://github.com/tensorspeech): nguyenquananhminh@gmail.com
+- [erogol](https://github.com/erogol): erengolge@gmail.com
+- [Kuan Chen](https://github.com/azraelkuan): azraelkuan@gmail.com
+- [Dawid Kobus](https://github.com/machineko): machineko@protonmail.com
+- [Takuya Ebata](https://github.com/MokkeMeguru): meguru.mokke@gmail.com
+- [Trinh Le Quang](https://github.com/l4zyf9x): trinhle.cse@gmail.com
+- [Yunchao He](https://github.com/candlewill): yunchaohe@gmail.com
+- [Alejandro Miguel Velasquez](https://github.com/ZDisket): xml506ok@gmail.com
 
 # License
 Overall, Almost models here are licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) for all countries in the world, except in **Viet Nam** this framework cannot be used for production in any way without permission from TensorFlowTTS's Authors. There is an exception, Tacotron-2 can be used with any purpose. If you are Vietnamese and want to use this framework for production, you **Must** contact us in advance.
