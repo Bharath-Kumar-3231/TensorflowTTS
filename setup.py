@@ -25,6 +25,7 @@ requirements = {
         "tensorflow-gpu==2.4.1",
         "tensorflow-addons>=0.10.0",
         "setuptools>=38.5.1",
+        "huggingface_hub==0.0.8",
         "librosa>=0.7.0",
         "soundfile>=0.10.2",
         "matplotlib>=3.1.0",
@@ -43,8 +44,7 @@ requirements = {
         "click",
         "g2p_en",
         "dataclasses",
-        "boto3",
-        "german_transliterate @ git+https://github.com/repodiac/german_transliterate.git#egg=german_transliterate"
+        "boto3"
     ],
     "setup": ["numpy", "pytest-runner",],
     "test": [
