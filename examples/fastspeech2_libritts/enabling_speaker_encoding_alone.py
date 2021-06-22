@@ -33,9 +33,7 @@ import yaml
 import json
 
 import tensorflow_tts
-from examples.fastspeech2_libritts.fastspeech2_dataset import (
-    CharactorDurationF0EnergyMelDataset,
-)
+
 from tensorflow_tts.configs import FastSpeech2Config
 from tensorflow_tts.models import TFFastSpeech2
 from tensorflow_tts.optimizers import AdamWeightDecay, WarmUp
@@ -261,7 +259,7 @@ def main():
         help="energy-stat path.",
     )
     parser.add_argument(
-        "--outdir", type=str, required=True, help="directory to save checkpoints."
+        "--outdir", type=str, required=False, help="directory to save checkpoints."
     )
     parser.add_argument(
         "--config", type=str, required=True, help="yaml format configuration file."
@@ -306,127 +304,13 @@ def main():
     # return strategy
     STRATEGY = return_strategy()
 
-    # set mixed precision config
-    if args.mixed_precision == 1:
-        tf.config.optimizer.set_experimental_options({"auto_mixed_precision": True})
-
-    args.mixed_precision = bool(args.mixed_precision)
-    args.use_norm = bool(args.use_norm)
-
-    # set logger
-    if args.verbose > 1:
-        logging.basicConfig(
-            level=logging.DEBUG,
-            stream=sys.stdout,
-            format="%(asctime)s (%(module)s:%(lineno)d) %(levelname)s: %(message)s",
-        )
-    elif args.verbose > 0:
-        logging.basicConfig(
-            level=logging.INFO,
-            stream=sys.stdout,
-            format="%(asctime)s (%(module)s:%(lineno)d) %(levelname)s: %(message)s",
-        )
-    else:
-        logging.basicConfig(
-            level=logging.WARN,
-            stream=sys.stdout,
-            format="%(asctime)s (%(module)s:%(lineno)d) %(levelname)s: %(message)s",
-        )
-        logging.warning("Skip DEBUG/INFO messages")
-
-    # check directory existence
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
-
-    # check arguments
-    if args.train_dir is None:
-        raise ValueError("Please specify --train-dir")
-    if args.dev_dir is None:
-        raise ValueError("Please specify --valid-dir")
-
     # load and save config
     with open(args.config) as f:
         config = yaml.load(f, Loader=yaml.Loader)
     config.update(vars(args))
     config["version"] = tensorflow_tts.__version__
-    with open(os.path.join(args.outdir, "config.yml"), "w") as f:
-        yaml.dump(config, f, Dumper=yaml.Dumper)
-    for key, value in config.items():
-        logging.info(f"{key} = {value}")
-
-    # get dataset
-    if config["remove_short_samples"]:
-        mel_length_threshold = config["mel_length_threshold"]
-    else:
-        mel_length_threshold = None
-
-    if config["format"] == "npy":
-        charactor_query = "*-ids.npy"
-        mel_query = "*-raw-feats.npy" if args.use_norm is False else "*-norm-feats.npy"
-        duration_query = "*-durations.npy"
-        f0_query = "*-raw-f0.npy"
-        energy_query = "*-raw-energy.npy"
-    else:
-        raise ValueError("Only npy are supported.")
-
-    # load speakers map from dataset map
-    with open(args.dataset_mapping) as f:
-        dataset_mapping = json.load(f)
-        speakers_map = dataset_mapping["speakers_map"]
-
-    # Check n_speakers matches number of speakers in speakers_map
     n_speakers = config["fastspeech2_params"]["n_speakers"]
-    assert n_speakers == len(
-        speakers_map
-    ), f"Number of speakers in dataset does not match n_speakers in config"
-
-    # define train/valid dataset
-    train_dataset = CharactorDurationF0EnergyMelDataset(
-        root_dir=args.train_dir,
-        charactor_query=charactor_query,
-        mel_query=mel_query,
-        duration_query=duration_query,
-        f0_query=f0_query,
-        energy_query=energy_query,
-        f0_stat=args.f0_stat,
-        energy_stat=args.energy_stat,
-        mel_length_threshold=mel_length_threshold,
-        speakers_map=speakers_map,
-    ).create(
-        is_shuffle=config["is_shuffle"],
-        allow_cache=config["allow_cache"],
-        batch_size=config["batch_size"]
-        * STRATEGY.num_replicas_in_sync
-        * config["gradient_accumulation_steps"],
-    )
-
-    valid_dataset = CharactorDurationF0EnergyMelDataset(
-        root_dir=args.dev_dir,
-        charactor_query=charactor_query,
-        mel_query=mel_query,
-        duration_query=duration_query,
-        f0_query=f0_query,
-        energy_query=energy_query,
-        f0_stat=args.f0_stat,
-        energy_stat=args.energy_stat,
-        mel_length_threshold=mel_length_threshold,
-        speakers_map=speakers_map,
-    ).create(
-        is_shuffle=config["is_shuffle"],
-        allow_cache=config["allow_cache"],
-        batch_size=config["batch_size"] * STRATEGY.num_replicas_in_sync,
-    )
-
-    # define trainer
-    trainer = FastSpeech2Trainer(
-        config=config,
-        strategy=STRATEGY,
-        steps=0,
-        epochs=0,
-        is_mixed_precision=args.mixed_precision,
-        stats_path=args.dataset_stats,
-        dataset_config=args.dataset_config,
-    )
+    
 
     with STRATEGY.scope():
         # define model
@@ -436,54 +320,20 @@ def main():
         fastspeech._build()
         fastspeech.summary()
 
-        if len(args.pretrained) > 1:
-            fastspeech.load_weights(args.pretrained, by_name=True, skip_mismatch=True)
-            logging.info(
-                f"Successfully loaded pretrained weight from {args.pretrained}."
-            )
+        train_vars = 'speaker_embeddings'.split('|') # should be modified as config['var_train_expr'].split('|')
+        for var in fastspeech.trainable_variables:
+          for vars_1 in train_vars:
+            if vars_1 in var.name:
+              print(var.name,var.shape)
+        
+        for layer_id in range(1,len(fastspeech.layers)):
+          fastspeech.layers[layer_id].trainable = False
+        
+        encoder_embedding_layer = fastspeech.layers[0]
+        encoder_embedding_layer.charactor_embeddings = tf.constant(encoder_embedding_layer.charactor_embeddings)
+        encoder_embedding_layer.speaker_fc.trainable = False
 
-        # AdamW for fastspeech
-        learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(
-            initial_learning_rate=config["optimizer_params"]["initial_learning_rate"],
-            decay_steps=config["optimizer_params"]["decay_steps"],
-            end_learning_rate=config["optimizer_params"]["end_learning_rate"],
-        )
-
-        learning_rate_fn = WarmUp(
-            initial_learning_rate=config["optimizer_params"]["initial_learning_rate"],
-            decay_schedule_fn=learning_rate_fn,
-            warmup_steps=int(
-                config["train_max_steps"]
-                * config["optimizer_params"]["warmup_proportion"]
-            ),
-        )
-
-        optimizer = AdamWeightDecay(
-            learning_rate=learning_rate_fn,
-            weight_decay_rate=config["optimizer_params"]["weight_decay"],
-            beta_1=0.9,
-            beta_2=0.98,
-            epsilon=1e-6,
-            exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"],
-        )
-
-        _ = optimizer.iterations
-
-    # compile trainer
-    trainer.compile(model=fastspeech, optimizer=optimizer)
-
-    # start training
-    try:
-        trainer.fit(
-            train_dataset,
-            valid_dataset,
-            saved_path=os.path.join(config["outdir"], "checkpoints/"),
-            resume=args.resume,
-        )
-    except KeyboardInterrupt:
-        trainer.save_checkpoint()
-        logging.info(f"Successfully saved checkpoint @ {trainer.steps}steps.")
-
+        fastspeech.summary()
 
 if __name__ == "__main__":
     main()
